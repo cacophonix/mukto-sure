@@ -9,6 +9,11 @@ import json
 import requests
 import duckduckgo
 from restapp.models import Question
+import unirest
+from collections import OrderedDict
+from bs4 import BeautifulSoup as bs
+import requests
+import opener
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -28,12 +33,29 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 
 def greetings(request):
+    answer = 'this is purely random text'
     try:
+        # response = requests.get('http://quotesondesign.com/api/3.0/api-3.0.json')
+        # json_data = json.loads(response.text)
+        # answer = json_data['quote']
+        url='http://ivyjoy.com/quote.shtml'
+
+        data=opener.fetch(url)['data']
+
+        soup=bs(data)
+
+        l=soup.text[1878:].split()
+
+        l=l[:len(l)-1]
+
+        t=" ".join(l)
+        answer=t
+
+    except:
         response = requests.get('http://quotesondesign.com/api/3.0/api-3.0.json')
         json_data = json.loads(response.text)
         answer = json_data['quote']
-    except:
-        answer = 'this is purely random text'
+        
     answer = answer.replace('\r', ' ')
     answer = answer.replace('\n', ' ')
     answer = " ".join(answer.split())
@@ -86,11 +108,13 @@ def qa(request):
 
     if question=="Tell me! What don't you know?":
         questions=Question.objects.all()
-        ans="";
+        ans={}
         cnt=1
+        print(len(questions))
         for q in questions:
-            ans=ans+"\r\n"+"#"+str(cnt)+" "+q.question+""
-
+            ans["#"+str(cnt)]=q.question
+            cnt=cnt+1
+        ans=OrderedDict(sorted(ans.items(), key=lambda t: int(t[0][1:])))
         return JsonResponse({"answer": ans})
 
     answer="Your majesty! Jon Snow knows nothing! So do I!"
