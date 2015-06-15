@@ -7,6 +7,8 @@ from rest_framework import viewsets
 from restapp.serializers import UserSerializer, GroupSerializer
 import json
 import requests
+import duckduckgo
+from restapp.models import Question
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -77,3 +79,22 @@ def weather(request):
             return JsonResponse({"answer": "Yes"})
         else:
             return JsonResponse({"answer": "No"})
+
+def qa(request):
+    question = request.GET.get('q', "muktosoft")
+
+    answer="Your majesty! Jon Snow knows nothing! So do I!"
+
+    try:
+        answer=duckduckgo.get_zci(question)
+    except:
+        q=Question(question=question)
+        q.save()
+
+    if answer[0:4]=="http":
+        q=Question(question=question)
+        q.save()
+        answer="Your majesty! Jon Snow knows nothing! So do I!"
+
+    return JsonResponse({"answer": answer})
+
