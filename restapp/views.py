@@ -81,7 +81,17 @@ def weather(request):
             return JsonResponse({"answer": "No"})
 
 def qa(request):
+    # print("hic")
     question = request.GET.get('q', "muktosoft")
+
+    if question=="Tell me! What don't you know?":
+        questions=Question.objects.all()
+        ans="";
+        cnt=1
+        for q in questions:
+            ans=ans+"\r\n"+"#"+str(cnt)+" "+q.question+""
+
+        return JsonResponse({"answer": ans})
 
     answer="Your majesty! Jon Snow knows nothing! So do I!"
 
