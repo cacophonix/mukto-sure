@@ -55,7 +55,7 @@ def greetings(request):
         response = requests.get('http://quotesondesign.com/api/3.0/api-3.0.json')
         json_data = json.loads(response.text)
         answer = json_data['quote']
-        
+
     answer = answer.replace('\r', ' ')
     answer = answer.replace('\n', ' ')
     answer = " ".join(answer.split())
